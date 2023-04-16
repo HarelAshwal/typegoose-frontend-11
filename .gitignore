@@ -170,3 +170,6 @@ test/config.json
 
 # typedoc docs folder
 doc/
+
+*.js
+*.js.map

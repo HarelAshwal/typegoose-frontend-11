@@ -1,5 +1,6 @@
 import { DecoratorKeys, PropType } from './internal/constants';
 import * as utils from './internal/utils';
+import 'reflect-metadata';
 import { logger } from './logSettings';
 import type {
   ArrayPropOptions,

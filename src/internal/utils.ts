@@ -1,5 +1,22 @@
 import { intersection, mergeWith, omit } from 'lodash';
-import * as mongoose from 'mongoose';
+import { isNode ,isBrowser} from 'browser-or-node';
+
+export function loadMoongoose() {
+  // import * as mongoose from 'mongoose';
+  if (isNode) {
+    var _require = eval('require');
+    // nodeJS
+    var mongoose = _require('mongoose');
+
+    return mongoose;
+  }
+  else {
+    console.log('client');
+  }
+}
+var mongoose = loadMoongoose();
+
+// import * as mongoose from 'mongoose';
 import { logger } from '../logSettings';
 import type {
   AnyParamConstructor,
@@ -28,6 +45,7 @@ import {
   StringLengthExpectedError,
 } from './errors';
 
+
 /**
  * Returns true, if the type is included in mongoose.Schema.Types
  * @param Type The Type to test
@@ -41,7 +59,7 @@ export function isPrimitive(Type: any): boolean {
       Object.getOwnPropertyNames(mongoose.Schema.Types).includes(Type.name) ||
       // try to match "Type.name" with all "mongoose.Schema.Types.*.name"
       // (like "SchemaString" with "mongoose.Schema.Types.String.name")
-      Object.values(mongoose.Schema.Types).findIndex((v) => v.name === Type.name) >= 0
+      Object.values(mongoose.Schema.Types).findIndex((v : any) => v.name === Type.name) >= 0
     );
   }
 
@@ -74,7 +92,7 @@ export function isAnRefType(Type: any): boolean {
       tmp.includes(Type.name) ||
       // try to match "Type.name" with all "mongoose.Schema.Types.*.name"
       // (like "SchemaString" with "mongoose.Schema.Types.String.name")
-      Object.values(mongoose.Schema.Types).findIndex((v) => v.name === Type.name) >= 0
+      Object.values(mongoose.Schema.Types).findIndex((v : any) => v.name === Type.name) >= 0
     );
   }
 
@@ -135,7 +153,7 @@ export function isString(Type: any): Type is string {
  * @param target The Target to get / init the cached schema
  * @returns The Schema to use
  */
-export function getCachedSchema(target: AnyParamConstructor<any>): Record<string, mongoose.SchemaDefinition<unknown>> {
+export function getCachedSchema(target: AnyParamConstructor<any>): Record<string, any> {
   let schemaReflectTarget = Reflect.getMetadata(DecoratorKeys.CachedSchema, target);
 
   if (isNullOrUndefined(schemaReflectTarget)) {
@@ -155,7 +173,7 @@ export function getCachedSchema(target: AnyParamConstructor<any>): Record<string
  * @param input The Input to fetch the class from
  */
 export function getClass(
-  input: mongoose.Document | IObjectWithTypegooseFunction | { typegooseName: string } | string | any
+  input:  IObjectWithTypegooseFunction | { typegooseName: string } | string | any
 ): NewableFunction | undefined {
   assertion(isGlobalCachingEnabled(), () => new CacheDisabledError('getClass'));
 
@@ -289,7 +307,7 @@ function customMerger(key: string | number, val: unknown): undefined | unknown {
  * @param value The value to use
  * @param cl The Class to get the values from
  */
-export function mergeSchemaOptions<U extends AnyParamConstructor<any>>(value: mongoose.SchemaOptions | undefined, cl: U) {
+export function mergeSchemaOptions<U extends AnyParamConstructor<any>>(value: any  | undefined, cl: U) {
   return mergeMetadata<IModelOptions>(DecoratorKeys.ModelOptions, { schemaOptions: value }, cl).schemaOptions;
 }
 
@@ -378,12 +396,12 @@ export function isNotDefined(Type: any) {
  */
 export function mapArrayOptions(
   rawOptions: any,
-  Type: AnyParamConstructor<any> | mongoose.Schema,
+  Type: AnyParamConstructor<any> | any,
   target: any,
   pkey: string,
   loggerType?: AnyParamConstructor<any>,
   extraInner?: KeyStringAny
-): mongoose.SchemaTypeOptions<any> {
+) {
   logger.debug('mapArrayOptions called');
   loggerType = loggerType ?? (Type as AnyParamConstructor<any>);
 
@@ -429,7 +447,7 @@ export function mapArrayOptions(
  */
 export function mapOptions(
   rawOptions: any,
-  Type: AnyParamConstructor<any> | (mongoose.Schema & IPrototype),
+  Type: AnyParamConstructor<any> | (any & IPrototype),
   target: any,
   pkey: string,
   loggerType?: AnyParamConstructor<any>
@@ -447,7 +465,7 @@ export function mapOptions(
   if (!(Type instanceof mongoose.Schema)) {
     // set the loggerType to the js type
     loggerType = Type;
-    const loggerTypeName = getName(loggerType);
+    const loggerTypeName = getName(loggerType as any);
 
     if (loggerTypeName in mongoose.Schema.Types) {
       logger.info('Converting "%s" to mongoose Type', loggerTypeName);
@@ -464,7 +482,7 @@ export function mapOptions(
   }
 
   /** The OptionsConstructor to use */
-  let OptionsCTOR: undefined | mongoose.SchemaTypeOptions<any> = Type?.prototype?.OptionsConstructor;
+  let OptionsCTOR: undefined | any = Type?.prototype?.OptionsConstructor;
 
   if (Type instanceof mongoose.Schema) {
     OptionsCTOR = mongoose.Schema.Types.Subdocument.prototype.OptionsConstructor;

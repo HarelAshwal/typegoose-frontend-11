@@ -1,5 +1,7 @@
 /* imports */
-import * as mongoose from 'mongoose';
+
+
+// import * as mongoose from 'mongoose';
 import 'reflect-metadata';
 import * as semver from 'semver';
 import {
@@ -9,18 +11,23 @@ import {
   isCachingEnabled,
   isGlobalCachingEnabled,
   isNullOrUndefined,
+  loadMoongoose,
   mapModelOptionsToNaming,
   mergeMetadata,
   warnNotMatchingExisting,
 } from './internal/utils';
 
+var _mongoose = loadMoongoose();
+
+import type * as mongoose from 'mongoose';
+
 // using "typeof process", because somehow js gives a ReferenceError when using "process === undefined" in browser
 /* istanbul ignore next */
-if (typeof process !== 'undefined' && !isNullOrUndefined(process?.version) && !isNullOrUndefined(mongoose?.version)) {
+if (typeof process !== 'undefined' && !isNullOrUndefined(process?.version) && !isNullOrUndefined(_mongoose?.version)) {
   // for usage on client side
   /* istanbul ignore next */
-  if (semver.lt(mongoose?.version, '7.0.3')) {
-    throw new Error(`Please use mongoose 7.0.3 or higher (Current mongoose: ${mongoose.version}) [E001]`);
+  if (semver.lt(_mongoose?.version, '7.0.3')) {
+    throw new Error(`Please use mongoose 7.0.3 or higher (Current mongoose: ${_mongoose.version}) [E001]`);
   }
 
   /* istanbul ignore next */
@@ -50,7 +57,7 @@ import { CacheDisabledError, ExpectedTypeError, FunctionCalledMoreThanSupportedE
 
 /* exports */
 // export the internally used "mongoose", to not need to always import it
-export { mongoose, setGlobalOptions };
+export { _mongoose, setGlobalOptions };
 export { setLogLevel, LogLevels } from './logSettings';
 export * from './prop';
 export * from './hooks';
@@ -98,9 +105,9 @@ export function getModelForClass<U extends AnyParamConstructor<any>, QueryHelper
   const modelFn =
     mergedOptions?.existingConnection?.model.bind(mergedOptions.existingConnection) ??
     mergedOptions?.existingMongoose?.model.bind(mergedOptions.existingMongoose) ??
-    mongoose.model.bind(mongoose);
+    _mongoose.model.bind(_mongoose);
 
-  const compiledModel: mongoose.Model<any> = modelFn(name, buildSchema(cl, mergedOptions));
+    const compiledModel: mongoose.Model<any> = modelFn(name, buildSchema(cl, mergedOptions));
 
   return addModelToTypegoose<U, QueryHelpers>(compiledModel, cl, {
     existingMongoose: mergedOptions?.existingMongoose,
@@ -213,7 +220,7 @@ export function addModelToTypegoose<U extends AnyParamConstructor<any>, QueryHel
   cl: U,
   options?: { existingMongoose?: mongoose.Mongoose; existingConnection?: any; disableCaching?: boolean }
 ) {
-  const mongooseModel = options?.existingMongoose?.Model || options?.existingConnection?.base?.Model || mongoose.Model;
+  const mongooseModel = options?.existingMongoose?.Model || options?.existingConnection?.base?.Model || _mongoose.Model;
 
   assertion(model.prototype instanceof mongooseModel, new NotValidModelError(model, 'addModelToTypegoose.model'));
   assertionIsClass(cl);

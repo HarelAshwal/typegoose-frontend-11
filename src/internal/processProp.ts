@@ -1,5 +1,5 @@
 import { logger } from '../logSettings';
-import { buildSchema, mongoose, Passthrough } from '../typegoose';
+import { buildSchema,_mongoose, Passthrough } from '../typegoose';
 import type {
   AnyParamConstructor,
   DiscriminatorObject,
@@ -26,6 +26,8 @@ import {
   DuplicateOptionsError,
 } from './errors';
 import * as utils from './utils';
+
+let mongoose = _mongoose;
 
 /**
  * Function that is the actual processing of the prop's (used for caching)
@@ -143,8 +145,8 @@ export function processProp(input: ProcessPropOptions): void {
       typeof rawOptions.ref === 'string'
         ? rawOptions.ref
         : utils.isConstructor(rawOptions.ref)
-        ? utils.getName(rawOptions.ref)
-        : rawOptions.ref;
+          ? utils.getName(rawOptions.ref)
+          : rawOptions.ref;
   }
 
   if (utils.isWithVirtualPOP(rawOptions)) {
@@ -162,7 +164,7 @@ export function processProp(input: ProcessPropOptions): void {
   if ('justOne' in rawOptions) {
     logger.warn(
       `Option "justOne" is defined in "${name}.${key}" but no Virtual-Populate-Options!\n` +
-        'Look here for more: https://typegoose.github.io/typegoose/docs/api/virtuals#virtual-populate'
+      'Look here for more: https://typegoose.github.io/typegoose/docs/api/virtuals#virtual-populate'
     );
   }
 
@@ -376,7 +378,7 @@ export function processProp(input: ProcessPropOptions): void {
         return;
       case PropType.MAP:
         let mapped: MappedInnerOuterOptions;
-        let finalType: mongoose.SchemaTypeOptions<any>;
+        let finalType;
 
         // Map the correct options for the end type
         if (utils.isTypeMeantToBeArray(rawOptions)) {

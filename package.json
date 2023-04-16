@@ -1,5 +1,5 @@
 {
-  "name": "@typegoose/typegoose",
+  "name": "typegoose-frontend-11",
   "version": "11.0.1",
   "description": "Define Mongoose models using TypeScript classes",
   "main": "lib/typegoose.js",
@@ -27,7 +27,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/typegoose/typegoose.git"
+    "url": "git+https://github.com/HarelAshwal/typegoose-frontend-11.git"
   },
   "author": "Akos Szokodi <akos@codingsans.com> (http://codingsans.com)",
   "contributors": [
@@ -94,7 +94,7 @@
     "odm"
   ],
   "bugs": {
-    "url": "https://github.com/typegoose/typegoose/issues"
+    "url": "https://github.com/HarelAshwal/typegoose-frontend-11/issues"
   },
   "homepage": "https://typegoose.github.io/typegoose/"
 }
