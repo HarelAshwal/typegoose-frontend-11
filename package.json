@@ -1,6 +1,6 @@
 {
   "name": "typegoose-frontend-11",
-  "version": "11.0.1",
+  "version": "11.0.2",
   "description": "Define Mongoose models using TypeScript classes",
   "main": "lib/typegoose.js",
   "types": "lib/typegoose.d.ts",
@@ -74,6 +74,7 @@
     "typescript": "~4.9.5"
   },
   "dependencies": {
+    "browser-or-node": "^2.1.1",
     "lodash": "^4.17.20",
     "loglevel": "^1.8.1",
     "reflect-metadata": "^0.1.13",
